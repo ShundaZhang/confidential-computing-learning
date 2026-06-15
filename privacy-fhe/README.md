@@ -2,6 +2,9 @@
 
 同态加密允许在密文上执行计算，解密计算结果后得到与明文计算相同或近似的结果。全同态加密（Fully Homomorphic Encryption, FHE）进一步允许对任意可表示的电路进行计算，是“数据始终保持加密”的重要隐私计算技术。
 
+## 架构图
+
+![全同态加密（FHE） 架构图](../diagrams/privacy-fhe.svg)
 ## 核心概念
 
 - Plaintext：原始数据。

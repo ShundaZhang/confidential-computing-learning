@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980">
+<defs>
+  <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#5b7fcb"/></marker>
+  <marker id="arrowGray" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#5f6673"/></marker>
+  <pattern id="grid" width="42" height="42" patternUnits="userSpaceOnUse"><path d="M42 0H0V42" fill="none" stroke="#f2f4f7" stroke-width="1"/></pattern>
+</defs>
+<rect width="1600" height="980" fill="#ffffff"/>
+<rect width="1600" height="980" fill="url(#grid)" opacity="0.55"/>
+<style>text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',Arial,sans-serif;}</style>
+
+<text x="70" y="76" font-size="30" font-weight="800" fill="#1f2933">安全多方计算（MPC）架构</text>
+<text x="70" y="112" font-size="17" fill="#8a96a8">Secret sharing / garbled circuits / OT · no single party sees all inputs</text>
+<rect x="1220" y="56" width="310" height="78" rx="10" fill="#ffffff" stroke="#d7dde7"/>
+<text x="1240" y="84" font-size="15" fill="#7c8798" font-weight="700">图例</text>
+<line x1="1240" y1="106" x2="1285" y2="106" stroke="#5b7fcb" stroke-width="4" marker-end="url(#arrowBlue)"/>
+<text x="1298" y="111" font-size="14" fill="#4b5563">可信接口 / 证明 / 密钥释放</text>
+<line x1="1240" y1="128" x2="1285" y2="128" stroke="#5f6673" stroke-width="3" stroke-dasharray="7 7" marker-end="url(#arrowGray)"/>
+<text x="1298" y="133" font-size="14" fill="#4b5563">不可信 I/O / 管理 / 元数据</text>
+<text x="150" y="165" font-size="16" fill="#8a96a8" font-weight="700">层次 / 信任域</text>
+<line x1="230" y1="188" x2="1540" y2="188" stroke="#e8edf3"/>
+<text x="70" y="260" text-anchor="start" font-size="19" font-weight="800" fill="#2f3742"><tspan x="70" dy="0">输入层</tspan></text>
+<text x="70" y="288" text-anchor="start" font-size="14" font-weight="500" fill="#98a2b3"><tspan x="70" dy="0">Private Inputs</tspan></text>
+<line x1="230" y1="343" x2="1540" y2="343" stroke="#e8edf3"/>
+<text x="70" y="415" text-anchor="start" font-size="19" font-weight="800" fill="#2f3742"><tspan x="70" dy="0">协议层</tspan></text>
+<text x="70" y="443" text-anchor="start" font-size="14" font-weight="500" fill="#98a2b3"><tspan x="70" dy="0">Shares / Circuits</tspan></text>
+<line x1="230" y1="498" x2="1540" y2="498" stroke="#e8edf3"/>
+<text x="70" y="570" text-anchor="start" font-size="19" font-weight="800" fill="#2f3742"><tspan x="70" dy="0">验证层</tspan></text>
+<text x="70" y="598" text-anchor="start" font-size="14" font-weight="500" fill="#98a2b3"><tspan x="70" dy="0">Malicious Security</tspan></text>
+<line x1="230" y1="653" x2="1540" y2="653" stroke="#e8edf3"/>
+<text x="70" y="725" text-anchor="start" font-size="19" font-weight="800" fill="#2f3742"><tspan x="70" dy="0">输出层</tspan></text>
+<text x="70" y="753" text-anchor="start" font-size="14" font-weight="500" fill="#98a2b3"><tspan x="70" dy="0">Result / Audit</tspan></text>
+<text x="393.75" y="199" text-anchor="middle" font-size="19" font-weight="800" fill="#2f3742">Party A</text>
+<text x="721.25" y="199" text-anchor="middle" font-size="19" font-weight="800" fill="#2f3742">MPC Protocol</text>
+<line x1="557.5" y1="213" x2="557.5" y2="790" stroke="#dfe6ef" stroke-width="1" stroke-dasharray="7 7"/>
+<text x="1048.75" y="199" text-anchor="middle" font-size="19" font-weight="800" fill="#5b7fcb">Party B / N</text>
+<line x1="885.0" y1="213" x2="885.0" y2="790" stroke="#dfe6ef" stroke-width="1" stroke-dasharray="7 7"/>
+<text x="1376.25" y="199" text-anchor="middle" font-size="19" font-weight="800" fill="#2f3742">Output Governance</text>
+<line x1="1212.5" y1="213" x2="1212.5" y2="790" stroke="#dfe6ef" stroke-width="1" stroke-dasharray="7 7"/>
+<rect x="256.0" y="218" width="275.5" height="93" rx="10" fill="#dcf8e5" stroke="#93b99d" stroke-width="2"/><text x="270.0" y="242" font-size="14" fill="#8a96a8" font-weight="600">[DATA]</text><text x="393.75" y="250.5" text-anchor="middle" font-size="21" font-weight="700" fill="#1f2933"><tspan x="393.75" dy="0">Private Input xA</tspan></text><text x="393.75" y="286.5" text-anchor="middle" font-size="15" font-weight="500" fill="#6b7280"><tspan x="393.75" dy="0">本地数据不出域</tspan></text>
+<rect x="911.0" y="218" width="275.5" height="93" rx="10" fill="#dcf8e5" stroke="#93b99d" stroke-width="2"/><text x="925.0" y="242" font-size="14" fill="#8a96a8" font-weight="600">[DATA]</text><text x="1048.75" y="250.5" text-anchor="middle" font-size="21" font-weight="700" fill="#1f2933"><tspan x="1048.75" dy="0">Private Input</tspan><tspan x="1048.75" dy="24">xB...xN</tspan></text><text x="1048.75" y="286.5" text-anchor="middle" font-size="15" font-weight="500" fill="#6b7280"><tspan x="1048.75" dy="0">其他参与方输入</tspan></text>
+<rect x="583.5" y="373" width="275.5" height="93" rx="10" fill="#5b7fcb" stroke="#5b7fcb" stroke-width="2"/><text x="597.5" y="397" font-size="14" fill="#8a96a8" font-weight="600">[PROTO]</text><text x="721.25" y="405.5" text-anchor="middle" font-size="21" font-weight="700" fill="#ffffff"><tspan x="721.25" dy="0">MPC Engine</tspan></text><text x="721.25" y="441.5" text-anchor="middle" font-size="15" font-weight="500" fill="#6b7280"><tspan x="721.25" dy="0">secret sharing· OT·</tspan><tspan x="721.25" dy="19">garbled circuit</tspan><tspan x="721.25" dy="19">Beaver triples·</tspan></text>
+<rect x="583.5" y="528" width="275.5" height="93" rx="10" fill="#eaf2ff" stroke="#8aa7d8" stroke-width="2"/><text x="597.5" y="552" font-size="14" fill="#8a96a8" font-weight="600">[CHECK]</text><text x="721.25" y="560.5" text-anchor="middle" font-size="21" font-weight="700" fill="#1f2933"><tspan x="721.25" dy="0">Consistency Checks</tspan></text><text x="721.25" y="596.5" text-anchor="middle" font-size="15" font-weight="500" fill="#6b7280"><tspan x="721.25" dy="0">MAC / ZKP /</tspan><tspan x="721.25" dy="19">cut-and-choose</tspan><tspan x="721.25" dy="19">防恶意偏离协议</tspan></text>
+<rect x="1238.5" y="683" width="275.5" height="93" rx="10" fill="#fff3ce" stroke="#c8a858" stroke-width="2"/><text x="1252.5" y="707" font-size="14" fill="#8a96a8" font-weight="600">[OUT]</text><text x="1376.25" y="715.5" text-anchor="middle" font-size="21" font-weight="700" fill="#1f2933"><tspan x="1376.25" dy="0">Allowed Output</tspan></text><text x="1376.25" y="751.5" text-anchor="middle" font-size="15" font-weight="500" fill="#6b7280"><tspan x="1376.25" dy="0">聚合结果·阈值·审计</tspan><tspan x="1376.25" dy="19">可叠加差分隐私</tspan></text>
+<line x1="531.5" y1="264.5" x2="583.5" y2="419.5" stroke="#5b7fcb" stroke-width="3" marker-end="url(#arrowBlue)"/><rect x="512.5" y="324.0" width="90" height="28" rx="7" fill="white" stroke="#5b7fcb" stroke-width="1.5"/><text x="557.5" y="343.0" text-anchor="middle" font-size="14" fill="#5b7fcb" font-weight="700">shares</text>
+<line x1="911.0" y1="264.5" x2="859.0" y2="419.5" stroke="#5b7fcb" stroke-width="3" marker-end="url(#arrowBlue)"/><rect x="840.0" y="324.0" width="90" height="28" rx="7" fill="white" stroke="#5b7fcb" stroke-width="1.5"/><text x="885.0" y="343.0" text-anchor="middle" font-size="14" fill="#5b7fcb" font-weight="700">shares</text>
+<line x1="721.25" y1="466" x2="721.25" y2="528" stroke="#5b7fcb" stroke-width="3" marker-end="url(#arrowBlue)"/><rect x="676.25" y="479.0" width="90" height="28" rx="7" fill="white" stroke="#5b7fcb" stroke-width="1.5"/><text x="721.25" y="498.0" text-anchor="middle" font-size="14" fill="#5b7fcb" font-weight="700">verify</text>
+<line x1="859.0" y1="574.5" x2="1238.5" y2="729.5" stroke="#5b7fcb" stroke-width="3" marker-end="url(#arrowBlue)"/><rect x="1003.75" y="634.0" width="90" height="28" rx="7" fill="white" stroke="#5b7fcb" stroke-width="1.5"/><text x="1048.75" y="653.0" text-anchor="middle" font-size="14" fill="#5b7fcb" font-weight="700">result</text>
+<rect x="70" y="815" width="1460" height="115" rx="9" fill="#f8fafc" stroke="#5f6673" stroke-width="2.5"/>
+<text x="90" y="841" font-size="15" fill="#7c8798" font-weight="800">协议强制层 · Cryptographic Security</text>
+<rect x="90.0" y="858" width="460.0" height="58" rx="10" fill="#eee7ff" stroke="#a796d8" stroke-width="2"/><text x="104.0" y="882" font-size="14" fill="#8a96a8" font-weight="600">[HW]</text><text x="320.0" y="873.0" text-anchor="middle" font-size="21" font-weight="700" fill="#1f2933"><tspan x="320.0" dy="0">Adversary Model</tspan></text><text x="320.0" y="909.0" text-anchor="middle" font-size="15" font-weight="500" fill="#6b7280"><tspan x="320.0" dy="0">半诚实 /恶意 /诚实多数</tspan></text>
+<rect x="570.0" y="858" width="460.0" height="58" rx="10" fill="#eee7ff" stroke="#a796d8" stroke-width="2"/><text x="584.0" y="882" font-size="14" fill="#8a96a8" font-weight="600">[HW]</text><text x="800.0" y="873.0" text-anchor="middle" font-size="21" font-weight="700" fill="#1f2933"><tspan x="800.0" dy="0">Preprocessing</tspan></text><text x="800.0" y="909.0" text-anchor="middle" font-size="15" font-weight="500" fill="#6b7280"><tspan x="800.0" dy="0">OT extension、 triples、随机掩码</tspan></text>
+<rect x="1050.0" y="858" width="460.0" height="58" rx="10" fill="#eee7ff" stroke="#a796d8" stroke-width="2"/><text x="1064.0" y="882" font-size="14" fill="#8a96a8" font-weight="600">[HW]</text><text x="1280.0" y="873.0" text-anchor="middle" font-size="21" font-weight="700" fill="#1f2933"><tspan x="1280.0" dy="0">Output Control</tspan></text><text x="1280.0" y="909.0" text-anchor="middle" font-size="15" font-weight="500" fill="#6b7280"><tspan x="1280.0" dy="0">结果泄露和预算治理</tspan></text>
+<text x="70" y="956" font-size="14" fill="#5b7fcb" font-weight="800">TCB：</text>
+<text x="115" y="956" font-size="14" fill="#7c8798">密码学假设 + 协议实现 + 参与方密钥/随机数；不依赖单一硬件 TEE</text>
+</svg>

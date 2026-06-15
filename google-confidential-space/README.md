@@ -2,6 +2,9 @@
 
 Google Confidential Space 是 Google Cloud 面向多方数据协作的机密计算服务。它基于 Confidential VM、hardened OS image、容器 workload 和 attestation，把“数据拥有方只向授权工作负载释放秘密”作为核心模型。
 
+## 架构图
+
+![Google Confidential Space 架构图](../diagrams/google-confidential-space.svg)
 ## 核心概念
 
 - Workload：处理受保护资源的容器镜像。

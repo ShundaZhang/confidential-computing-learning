@@ -2,6 +2,9 @@
 
 Apple Private Cloud Compute（PCC）是 Apple 为 Apple Intelligence 构建的私有云 AI 推理架构。它不是给第三方任意部署 workload 的通用 TEE，而是 Apple 自有设备、Apple silicon 服务器、受限云操作系统、透明日志和客户端验证机制组成的一套端到端隐私架构。
 
+## 架构图
+
+![Apple Private Cloud Compute 架构图](../diagrams/apple-pcc.svg)
 ## 设计目标
 
 Apple 公布的 PCC 目标包括：

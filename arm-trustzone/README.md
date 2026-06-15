@@ -2,6 +2,9 @@
 
 Arm TrustZone 是 Arm SoC 上广泛部署的安全隔离技术。它把系统划分为 Secure world 和 Non-secure world：普通操作系统通常运行在 Non-secure world，安全监控器、TEE OS 和可信应用运行在 Secure world。TrustZone 更像设备级安全基础设施，而不是云多租户机密 VM 技术。
 
+## 架构图
+
+![Arm TrustZone 架构图](../diagrams/arm-trustzone.svg)
 ## 核心概念
 
 - Secure world：更高信任级别的执行世界，承载安全启动、密钥、TEE OS 和可信应用。

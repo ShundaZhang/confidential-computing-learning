@@ -2,6 +2,9 @@
 
 Arm Confidential Compute Architecture（CCA）是 Armv9-A 面向机密计算的体系结构。它在传统 Normal world 和 Secure world 之外引入 Realm world，使云和边缘平台能够运行受保护的 Realm VM。用户提到的 “ARM ACC” 通常应指 Arm CCA。
 
+## 架构图
+
+![Arm CCA 架构图](../diagrams/arm-cca.svg)
 ## 核心概念
 
 - Realm：受 CCA 保护的执行环境，可承载机密 VM。

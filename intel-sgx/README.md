@@ -2,6 +2,9 @@
 
 Intel Software Guard Extensions（SGX）是一组 CPU 指令和平台机制，用于在普通进程内部创建受硬件保护的 enclave。SGX 的目标不是保护整台虚拟机，而是把敏感代码和数据切成更小的可信区域，使操作系统、hypervisor、系统管理员和同机进程即使拥有更高权限，也不能直接读取或修改 enclave 内存。
 
+## 架构图
+
+![Intel SGX 架构图](../diagrams/intel-sgx.svg)
 ## 核心概念
 
 - Enclave：进程地址空间中的受保护区域，包含可信代码、栈、堆和密钥材料。

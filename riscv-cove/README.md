@@ -2,6 +2,9 @@
 
 RISC-V CoVE（Confidential VM Extension）是 RISC-V 面向机密虚拟机的体系结构和 ABI 工作方向，主要由 RISC-V AP-TEE Task Group 推进。它的目标是在开放 RISC-V 平台上提供类似 Intel TDX、AMD SEV-SNP、Arm CCA 的 confidential VM 能力。
 
+## 架构图
+
+![RISC-V CoVE 架构图](../diagrams/riscv-cove.svg)
 ## 当前状态
 
 CoVE 相关规范仍在演进。RISC-V AP-TEE 仓库说明该规范用于支持 RISC-V application-processor 平台上的 Confidential VM Extension，且文档在未 ratify 前可能变化。因此，学习 CoVE 时应把它视为标准化中的参考架构，而不是已经像 SEV-SNP/TDX 那样大规模商用部署的技术。

@@ -2,6 +2,9 @@
 
 AMD Secure Encrypted Virtualization（SEV）是一组面向虚拟机的内存加密技术。SEV-SNP（Secure Nested Paging）是 SEV 系列的重要增强，在 SEV 的 VM 内存加密和 SEV-ES 的寄存器状态保护基础上，增加了对恶意 hypervisor 的内存重映射、重放和页状态攻击的硬件防护，并提供更强的 guest attestation。
 
+## 架构图
+
+![AMD SEV-SNP 架构图](../diagrams/amd-sev-snp.svg)
 ## 技术演进
 
 - SME：Secure Memory Encryption，提供系统内存加密能力。

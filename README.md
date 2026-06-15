@@ -34,6 +34,29 @@
 | 差分隐私 | 用可量化噪声限制单个样本影响 | [differential-privacy](./differential-privacy/README.md) |
 | 联邦学习 | 数据留在本地，交换模型更新 | [federated-learning](./federated-learning/README.md) |
 
+## 架构图索引
+
+| 技术 | 架构图 |
+| --- | --- |
+| Intel SGX | [SVG](./diagrams/intel-sgx.svg) |
+| Intel TDX | [SVG](./diagrams/intel-tdx.svg) |
+| AMD SEV-SNP | [SVG](./diagrams/amd-sev-snp.svg) |
+| Arm CCA | [SVG](./diagrams/arm-cca.svg) |
+| Arm TrustZone | [SVG](./diagrams/arm-trustzone.svg) |
+| RISC-V CoVE | [SVG](./diagrams/riscv-cove.svg) |
+| RISC-V Keystone | [SVG](./diagrams/riscv-keystone.svg) |
+| Apple Private Cloud Compute | [SVG](./diagrams/apple-pcc.svg) |
+| AWS Nitro Enclaves | [SVG](./diagrams/aws-nitro-enclaves.svg) |
+| NVIDIA Confidential Computing | [SVG](./diagrams/nvidia-confidential-computing.svg) |
+| IBM Secure Execution | [SVG](./diagrams/ibm-secure-execution.svg) |
+| Azure Confidential VM | [SVG](./diagrams/azure-confidential-vm.svg) |
+| Google Confidential Space | [SVG](./diagrams/google-confidential-space.svg) |
+| 安全多方计算（MPC） | [SVG](./diagrams/privacy-mpc.svg) |
+| 全同态加密（FHE） | [SVG](./diagrams/privacy-fhe.svg) |
+| 零知识证明（ZKP） | [SVG](./diagrams/privacy-zkp.svg) |
+| 差分隐私 | [SVG](./diagrams/differential-privacy.svg) |
+| 联邦学习 | [SVG](./diagrams/federated-learning.svg) |
+
 ## 总体对比
 
 | 维度 | 应用级 TEE | VM 级 TEE | 云平台 TEE 服务 | 密码学隐私计算 |

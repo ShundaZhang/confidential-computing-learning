@@ -2,6 +2,9 @@
 
 AWS Nitro Enclaves 是 Amazon EC2 的 enclave 功能。它从一台父 EC2 实例中切分 vCPU 和内存，创建一个隔离、受约束的 enclave VM。Enclave 没有持久化存储、没有交互式 shell、没有外部网络，只能通过 vsock 与父实例通信。
 
+## 架构图
+
+![AWS Nitro Enclaves 架构图](../diagrams/aws-nitro-enclaves.svg)
 ## 核心概念
 
 - Parent instance：启动和管理 enclave 的普通 EC2 实例。

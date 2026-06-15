@@ -2,6 +2,9 @@
 
 NVIDIA Confidential Computing 把机密计算边界扩展到 GPU，主要面向 AI/ML 加速负载。传统 CPU TEE 可以保护 guest CPU 内存，但当模型和数据进入 GPU HBM、驱动和 PCIe 传输路径时，安全边界会被拉宽。NVIDIA Hopper H100 及后续平台提供 GPU 侧安全启动、内存保护、链路加密和 attestation 能力，用于保护敏感模型和数据在 GPU 上的使用中状态。
 
+## 架构图
+
+![NVIDIA Confidential Computing 架构图](../diagrams/nvidia-confidential-computing.svg)
 ## 核心概念
 
 - GPU CC mode：GPU 进入机密计算模式，限制调试和管理访问。

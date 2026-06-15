@@ -2,6 +2,9 @@
 
 IBM Secure Execution for Linux 是 IBM Z 和 LinuxONE 平台上的机密计算能力，用于运行受保护的 Linux 虚拟机。它的目标是在大型机虚拟化环境中保护 guest 内存和状态，使云管理员、host hypervisor 或其他高权限软件无法读取受保护 VM 的明文。
 
+## 架构图
+
+![IBM Secure Execution 架构图](../diagrams/ibm-secure-execution.svg)
 ## 核心概念
 
 - Protected VM：启用 Secure Execution 的受保护 Linux 虚拟机。

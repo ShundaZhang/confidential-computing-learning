@@ -2,6 +2,9 @@
 
 Azure Confidential VM 是 Microsoft Azure 的机密虚拟机服务，底层使用 AMD SEV-SNP 或 Intel TDX 等硬件 TEE。它面向“尽量少改代码”的云迁移：把整台 VM 置于硬件隔离边界内，同时结合 vTPM、Secure Boot、attestation 和机密 OS 磁盘加密。
 
+## 架构图
+
+![Azure Confidential VM 架构图](../diagrams/azure-confidential-vm.svg)
 ## 核心能力
 
 - VM 级硬件隔离：在 VM、hypervisor 和 host 管理代码之间建立硬件边界。
