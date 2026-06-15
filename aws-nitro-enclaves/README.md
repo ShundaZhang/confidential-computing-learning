@@ -27,6 +27,71 @@ Nitro Enclave 的设计强调“强约束”。父实例负责拉取数据、转
 
 这种模式常用于把 TLS 私钥、数据库解密密钥、PII 处理逻辑、签名服务放入更窄的边界。
 
+## 隔离模型与资源切分
+
+Nitro Enclaves 从父 EC2 实例中划走固定数量的 vCPU 和内存。Enclave 不是普通 EC2 实例，也没有独立 ENI/EBS/IMDS。它的“缺功能”本身就是安全机制：
+
+| 能力 | Enclave 状态 | 安全含义 |
+| --- | --- | --- |
+| 外部网络 | 无 | 降低数据直接外传路径 |
+| 持久磁盘 | 无 | 减少请求后残留 |
+| SSH/交互 shell | 无 | 降低运维绕过路径 |
+| Instance metadata | 无 | 不能直接拿父实例凭据 |
+| 通信 | vsock only | I/O 必须经过父实例代理 |
+
+这种设计把攻击面收缩到三处：enclave 镜像本身、vsock 协议、父实例代理逻辑。父实例仍然是强不可信组件：它可以篡改请求、重放数据、丢弃响应、改变顺序或拒绝服务。
+
+## EIF measurement 与 PCR
+
+Enclave Image File（EIF）在构建时会形成多个 measurement/PCR 值。KMS policy 常根据这些值判断是否允许解密。实践中至少要区分：
+
+- 镜像内容 measurement：代码、runtime、依赖和入口点。
+- 签名证书/构建身份：谁构建和签署了 EIF。
+- 启动配置：部分场景中需要绑定 enclave 启动参数。
+- Enclave 内生成的公钥：通过 attestation document 的 user data/public key 绑定密钥释放通道。
+
+密钥释放策略不要只写“来自 Nitro Enclave 即可”。更安全的是绑定预期 PCR、账户、region、KMS key policy、父实例 role 和业务上下文。
+
+## Attestation document 与 KMS 流程
+
+典型流程可以细化为：
+
+```text
+Enclave starts service
+  -> generates ephemeral key pair
+  -> asks Nitro Hypervisor for attestation document
+  -> includes nonce/user data/public key hash
+  -> parent forwards document to AWS KMS
+  -> KMS verifies AWS Nitro signature and PCR policy
+  -> KMS returns ciphertext encrypted for enclave key
+  -> parent forwards ciphertext, enclave decrypts inside boundary
+```
+
+父实例只是搬运工。它可以看到 KMS 请求元数据，但不应看到数据密钥明文。Enclave 应验证父实例传入的业务数据签名、时间戳、nonce 和协议状态，避免父实例重放旧密文或旧请求。
+
+## 典型软件栈
+
+```text
+Parent EC2 instance
+  - application proxy / vsock proxy
+  - KMS client or network forwarder
+  - logging/metrics without secrets
+  - enclave lifecycle manager
+
+Nitro Enclave
+  - minimal Linux/rootfs
+  - sensitive service
+  - attestation document request
+  - local key unwrapping and cryptographic operation
+```
+
+常见工程模式：
+
+- 把 TLS private key 放入 enclave，父实例只代理 TCP。
+- 把 PII tokenization/de-tokenization 放入 enclave。
+- Enclave 从 KMS 解密 envelope key，处理数据库字段级加密。
+- 父实例只保留密文和不可逆标识。
+
 ## 安全模型
 
 Nitro Enclaves 通常信任：
@@ -48,6 +113,20 @@ Nitro Enclaves 通常不信任：
 - Enclave 不能修复应用漏洞。若敏感服务本身可被远程利用，攻击者仍可能在 enclave 内执行代码。
 - Attestation policy 是核心控制点。KMS 条件应绑定 PCR/measurement、镜像版本和业务上下文。
 - Nitro Enclaves 是 AWS 专有平台能力，不是跨云可移植 TEE 标准。
+- Enclave 内 runtime 和应用漏洞仍可导致密钥泄露或签名滥用。
+- 父实例日志、代理 buffer、core dump 和 metrics 不能记录明文请求或密钥材料。
+- Enclave 没有外网并不等于没有外传：父实例可被 enclave 服务响应内容当作 covert channel。
+- 更新镜像后 PCR 会变化，KMS policy 和发布流程必须同步管理。
+
+## 与 SGX/VM 级 TEE 的对比
+
+| 维度 | Nitro Enclaves | SGX | TDX/SEV-SNP |
+| --- | --- | --- | --- |
+| 粒度 | 父实例内隔离 micro-VM | 进程 enclave | 整 VM |
+| I/O | vsock 经过父实例 | OCALL/不可信 runtime | guest OS + shared pages |
+| 部署 | AWS EC2 专有 | Intel CPU 生态 | 多云 confidential VM |
+| 密钥集成 | AWS KMS attestation condition | DCAP/自建 KMS | 云 KMS/attestation |
+| 优势 | 强约束、KMS 集成简单 | 小 TCB | 迁移现有 workload |
 
 ## 适用场景
 
@@ -58,4 +137,3 @@ Nitro Enclaves 适合密钥使用、签名、证书私钥保护、PII tokenizati
 - AWS Nitro Enclaves overview: https://docs.aws.amazon.com/enclaves/latest/user/nitro-enclave.html
 - AWS Nitro System security design: https://docs.aws.amazon.com/whitepapers/latest/security-design-of-aws-nitro-system/the-aws-nitro-system.html
 - Nitro Enclaves KMS integration: https://docs.aws.amazon.com/enclaves/latest/user/kms.html
-

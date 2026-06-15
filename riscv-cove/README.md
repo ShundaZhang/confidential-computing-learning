@@ -29,6 +29,70 @@ RISC-V 平台可组合使用以下能力：
 
 由于 RISC-V 是开放 ISA，CoVE 的一个关键价值是把机密 VM 所需的 ISA、非 ISA、固件、ABI 和 SoC 要求公开化，便于不同厂商实现可互操作的机密计算平台。
 
+## 预期软件栈
+
+CoVE 生态可以按以下层次理解：
+
+```text
+TVM guest: guest firmware / guest kernel / workload
+TSM:       TVM lifecycle, memory ownership, measurement, attestation
+Host:      KVM/VMM, resource scheduling, shared memory, device emulation
+Machine:   RISC-V privilege, interrupt, IOMMU/PMP/ePMP, secure boot
+```
+
+关键是 TSM（TEE Security Manager）。它的角色类似：
+
+- Intel TDX 的 TDX Module。
+- Arm CCA 的 RMM。
+- AMD SEV-SNP 中 CPU/PSP/RMP 组合的一部分安全职能。
+
+TSM 负责让 host 的 TVM 管理请求变成受检查的状态转换，而不是任由 host 修改 TVM 私有内存和度量。
+
+## 内存所有权模型
+
+CoVE 需要定义 host page 与 TVM private page 的转换语义。虽然具体实现会随规范和平台变化，但安全目标通常包括：
+
+- Host 不能把 TVM 私有页映射到 host 地址空间读取。
+- Host 不能把同一物理页同时分配给多个 TVM。
+- TVM 必须能确认新加入的页已进入正确私有状态。
+- 页回收时必须清理或重新初始化，避免数据残留。
+- DMA 设备不能绕过 TVM 内存边界。
+
+一个抽象生命周期：
+
+```text
+Host-owned page
+  -> donate/delegate to TSM
+  -> assign to TVM
+  -> TVM accepts and uses privately
+  -> optional share for I/O
+  -> reclaim with zeroing/state reset
+```
+
+这和 CCA granule delegation、TDX private/shared GPA、SEV-SNP RMP validation 是同一类问题，只是 RISC-V 试图把接口标准化。
+
+## Attestation 设计要点
+
+CoVE 的 attestation 需要回答四个问题：
+
+1. 平台是否从可信 Boot ROM/firmware 启动。
+2. TSM 是否为预期版本和配置。
+3. TVM 初始镜像、配置、启动参数是否匹配预期。
+4. 当前报告是否绑定 verifier nonce 或 TVM 生成的临时公钥。
+
+因为 RISC-V 是多厂商开放生态，证明链的互操作比单厂商平台更难。Verifier 需要理解设备证书、TSM 证书、SoC 安全属性、固件度量、规范版本和厂商扩展 claims。
+
+## 与 Keystone 的区别
+
+| 维度 | CoVE | Keystone |
+| --- | --- | --- |
+| 目标 | 标准化 confidential VM | 开源可定制 enclave 框架 |
+| 粒度 | VM/TVM | 应用/runtime enclave |
+| 可信管理层 | TSM | Security Monitor |
+| 主要场景 | 云/服务器 RISC-V | 研究、边缘、可验证 TEE |
+| 状态 | 标准和生态演进中 | 已有开源框架和论文实现 |
+| 类比 | TDX/SEV-SNP/CCA | SGX/应用级 TEE |
+
 ## 安全模型
 
 CoVE 预期信任：
@@ -49,6 +113,10 @@ CoVE 预期不信任：
 - 仅有 ISA 规范不足以保证安全；还需要 SoC 内存控制、IOMMU、调试锁定、固件更新和证书体系。
 - 与其他 VM 级 TEE 一样，CoVE 不自动消除侧信道、DoS、guest 漏洞和输出泄露。
 - Attestation 互操作是落地关键：verifier 需要理解 TSM 版本、平台证书链和 TVM 度量语义。
+- Host 仍可能控制调度、中断、I/O、时钟和资源压力。
+- 设备访问需要 IOMMU/设备证明/受保护 I/O，否则 DMA 可能破坏边界。
+- 规范未定稿时，不同原型的安全 claims 不能直接等价。
+- 开放硬件提高可审计性，但也意味着平台安全质量差异可能更大。
 
 ## 适用场景
 
@@ -59,4 +127,3 @@ CoVE 适合关注开放硬件、可审计固件、学术研究、边缘平台和
 - RISC-V AP-TEE specifications: https://github.com/riscv-non-isa/riscv-ap-tee
 - CoVE paper: https://arxiv.org/abs/2304.06167
 - RISC-V International: https://riscv.org/
-

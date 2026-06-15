@@ -45,6 +45,76 @@
 | 主要优势 | TCB 小、密钥边界细 | 迁移成本低、适合通用云负载 | 运维集成好、KMS/IAM/审计完善 | 不依赖硬件供应商，安全定义清晰 |
 | 主要短板 | enclave 接口复杂、侧信道面大 | TCB 大于应用级、I/O 边界复杂 | 信任和可用性绑定云平台 | 性能、工程复杂度和输出泄露控制 |
 
+## 安全架构分类
+
+从安全架构角度，可以把本仓库技术按“保护边界在哪里”分成几类：
+
+| 类别 | 代表技术 | 安全边界 | 典型不可信对象 | 核心证明材料 |
+| --- | --- | --- | --- | --- |
+| 进程内 enclave | Intel SGX、RISC-V Keystone | 应用选定代码/数据 | OS、hypervisor、host 进程 | MRENCLAVE/measurement、quote |
+| Confidential VM | Intel TDX、AMD SEV-SNP、Arm CCA、IBM Secure Execution | 整个 guest VM | Host OS、VMM、云管理员 | TD quote、SNP report、CCA token、protected image evidence |
+| 受限子 VM/enclave | AWS Nitro Enclaves | 父实例内隔离 micro-VM | 父实例 root、代理进程 | Nitro attestation document、PCR |
+| 加速器 TEE | NVIDIA Confidential Computing | GPU HBM/执行路径 + CPU CVM | Host、PCIe 路径、GPU 管理面 | CPU quote + GPU evidence |
+| 托管隐私云系统 | Apple PCC、Google Confidential Space、Azure CVM | 云厂商产品化 TEE/证明/KMS | Operator、运维面、错误 workload | 透明日志、attestation token、vTPM/PCR、image digest |
+| 密码学协议 | MPC、FHE、ZKP | 协议定义的输入/见证/密文 | 其他参与方、计算服务器、证明者 | 证明、密文、transcript、参数 |
+| 统计隐私 | 差分隐私、联邦学习 + DP | 输出分布或模型更新 | 查询者、服务器、模型接收方 | epsilon/delta、privacy accountant、聚合证明 |
+
+## 共同实现模式
+
+多数机密计算系统最终都会落到类似流程：
+
+```text
+1. Build:   构建镜像/enclave/workload，形成 measurement 或 digest
+2. Launch:  平台在 TEE 中启动 workload，并记录硬件/固件/镜像状态
+3. Attest:  workload 生成带 nonce/公钥绑定的证明
+4. Verify:  远程 verifier 检查平台、TCB、measurement、策略和新鲜性
+5. Release: KMS/数据拥有方只向证明绑定的 workload 释放密钥或数据
+6. Run:     workload 在边界内处理数据，通过共享页/I/O/输出通道交互
+7. Audit:   记录证明、密钥释放、版本、输出和预算消耗
+```
+
+不同技术的差异主要体现在：
+
+- 谁负责资源管理：OS、hypervisor、RMM/TDX Module/PSP/ultravisor、云平台。
+- 私有内存如何标记：EPCM、PAMT/SEPT、RMP、GPT、PMP、Nitro 隔离。
+- 证明绑定什么：代码 hash、签名者、VM firmware、kernel、容器 digest、GPU 固件、透明日志。
+- 密钥由谁释放：远程 KMS、云 KMS、数据拥有方、客户端设备、HSM。
+- 输出如何约束：TEE 本身通常不约束输出，需要 DP、审计、固定 workload 或业务策略。
+
+## 关键术语对照
+
+| 概念 | SGX | TDX | SEV-SNP | Arm CCA | Nitro Enclaves | Keystone |
+| --- | --- | --- | --- | --- | --- | --- |
+| 保护对象 | Enclave | Trust Domain | SNP VM | Realm VM | Enclave micro-VM | Enclave |
+| 内存单位/元数据 | EPC/EPCM | PAMT/SEPT | RMP | Granule/GPT | Nitro isolation/PCR | PMP region |
+| 管理组件 | CPU/SGX runtime/QE | TDX Module | AMD Secure Processor | RMM + EL3 firmware | Nitro Hypervisor | Security Monitor |
+| Guest-host 接口 | ECALL/OCALL | TDCALL/SEAMCALL | GHCB | RSI/RMI | vsock | edge call |
+| 初始度量 | MRENCLAVE | MRTD/RTMR | launch digest/measurement | Realm measurement | EIF PCR | enclave measurement |
+| 证明 | SGX quote | TD quote | SNP report | CCA token | attestation document | monitor-signed report |
+
+## 安全边界速查
+
+| 技术 | 主要保护 | 不保护/弱保护 |
+| --- | --- | --- |
+| SGX | 小 TCB 代码和数据免受 OS/hypervisor 直接访问 | OCALL/ECALL 漏洞、侧信道、I/O、回滚 |
+| TDX | 整 VM 私有内存和 vCPU 状态 | Guest 内漏洞、共享页、设备 I/O、DoS |
+| SEV-SNP | VM 内存加密、寄存器状态、RMP 页归属 | Guest TCB、GHCB/共享页、平台固件补丁依赖 |
+| Arm CCA | Realm 私有内存、granule ownership、Realm measurement | I/O、生态成熟度、guest 内漏洞、侧信道 |
+| TrustZone | 设备 Secure world、密钥和安全外设 | 多租户 VM、TEE OS 漏洞、厂商实现差异 |
+| CoVE | RISC-V confidential VM 标准化目标 | 规范/生态成熟度、具体 SoC 实现差异 |
+| Keystone | 可定制 RISC-V enclave | 物理内存加密、PMP 数量、生产化供应链 |
+| Apple PCC | Apple AI 请求的云侧受限处理 | 第三方自定义 workload、节点内明文计算、输出泄露 |
+| Nitro Enclaves | 父实例内敏感服务隔离和 KMS 绑定 | 父实例 DoS/重放、vsock 协议漏洞、跨云可移植性 |
+| NVIDIA CC | GPU HBM/执行路径和 CPU-GPU 数据流 | 模型输出泄露、多设备路径、驱动/runtime TCB |
+| IBM Secure Execution | IBM Z protected Linux VM | 跨平台通用性、guest 内漏洞、运维功能限制 |
+| Azure CVM | 云 VM + vTPM + Key Vault/attestation | Azure 策略配置、guest agent、数据离 VM 后边界 |
+| Google Confidential Space | 受证明容器 workload 的多方数据协作 | Workload 输出泄露、policy 过宽、镜像供应链 |
+| MPC | 多方输入和中间值 | 输出推断、DoS、恶意输入、元数据 |
+| FHE | 密文输入和中间计算 | 计算正确性、输出泄露、访问模式 |
+| ZKP | 私有 witness 和计算正确性证明 | 公开输入、约束错误、业务真实性 |
+| 差分隐私 | 输出对单个样本的可推断影响 | 原始数据访问、预算绕过、非个体秘密 |
+| 联邦学习 | 原始数据本地化 | 梯度泄露、投毒、恶意服务器、最终模型泄露 |
+
 ## 常见安全边界
 
 机密计算常见目标是把云管理员、宿主机内核、虚拟机监控器、同机租户、部分物理内存攻击排除在明文访问边界之外。但它通常不自动解决以下问题：
@@ -64,6 +134,15 @@
 - 需要多方联合计算且不希望信任单一硬件/云：评估 MPC、FHE、ZKP，接受更高性能和工程成本。
 - 需要发布统计结果或训练模型：差分隐私常作为 TEE、联邦学习、数据 clean room 的补充，而不是替代加密。
 
+更细的选型问题：
+
+- 你的主要敌手是谁：云管理员、同机租户、数据合作方、模型使用者、恶意客户端，还是外部攻击者？
+- 秘密在哪里出现明文：CPU 内、GPU HBM、guest kernel、共享内存、磁盘、日志、网络、输出结果？
+- 谁能写 workload：你自己、云平台、Apple/Google 固定服务、第三方容器作者？
+- Verifier 能否稳定识别预期版本：measurement、image digest、签名者、TCB、透明日志是否可自动检查？
+- 是否需要防输出推断：如果是，TEE 之外还要设计差分隐私、阈值、审计或固定查询。
+- 是否需要跨云/跨硬件可移植：云原生 TEE 集成越深，可移植性通常越低。
+
 ## 参考入口
 
 - Confidential Computing Consortium: https://confidentialcomputing.io/
@@ -79,4 +158,3 @@
 - NVIDIA Trusted Computing: https://docs.nvidia.com/nvtrust/index.html
 - Azure Confidential Computing: https://learn.microsoft.com/en-us/azure/confidential-computing/overview
 - Google Confidential Computing: https://docs.cloud.google.com/confidential-computing/
-
