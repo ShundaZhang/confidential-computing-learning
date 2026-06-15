@@ -5,6 +5,7 @@
 ## 架构图
 
 ![零知识证明（ZKP） 架构图](../diagrams/privacy-zkp.svg)
+
 ## 三个基本性质
 
 - Completeness：若陈述为真，诚实证明者能让诚实验证者接受。

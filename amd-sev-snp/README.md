@@ -5,6 +5,7 @@ AMD Secure Encrypted Virtualization（SEV）是一组面向虚拟机的内存加
 ## 架构图
 
 ![AMD SEV-SNP 架构图](../diagrams/amd-sev-snp.svg)
+
 ## 技术演进
 
 - SME：Secure Memory Encryption，提供系统内存加密能力。

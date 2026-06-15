@@ -5,6 +5,7 @@ NVIDIA Confidential Computing 把机密计算边界扩展到 GPU，主要面向 
 ## 架构图
 
 ![NVIDIA Confidential Computing 架构图](../diagrams/nvidia-confidential-computing.svg)
+
 ## 核心概念
 
 - GPU CC mode：GPU 进入机密计算模式，限制调试和管理访问。

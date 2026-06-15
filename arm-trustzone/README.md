@@ -5,6 +5,7 @@ Arm TrustZone 是 Arm SoC 上广泛部署的安全隔离技术。它把系统划
 ## 架构图
 
 ![Arm TrustZone 架构图](../diagrams/arm-trustzone.svg)
+
 ## 核心概念
 
 - Secure world：更高信任级别的执行世界，承载安全启动、密钥、TEE OS 和可信应用。

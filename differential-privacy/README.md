@@ -5,6 +5,7 @@
 ## 架构图
 
 ![差分隐私 架构图](../diagrams/differential-privacy.svg)
+
 ## 核心概念
 
 - 邻接数据集：只相差一个个体记录的两个数据集。

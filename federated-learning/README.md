@@ -5,6 +5,7 @@
 ## 架构图
 
 ![联邦学习 架构图](../diagrams/federated-learning.svg)
+
 ## 核心流程
 
 1. 服务器选择一批客户端或机构。

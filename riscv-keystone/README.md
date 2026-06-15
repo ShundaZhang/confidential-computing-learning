@@ -5,6 +5,7 @@ Keystone 是一个开源的 RISC-V TEE 框架，用于构建可定制的 enclave
 ## 架构图
 
 ![RISC-V Keystone 架构图](../diagrams/riscv-keystone.svg)
+
 ## 核心概念
 
 - Enclave：受保护的应用执行环境。

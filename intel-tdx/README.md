@@ -5,6 +5,7 @@ Intel Trust Domain Extensions（TDX）是 Intel 面向云和虚拟化环境的 V
 ## 架构图
 
 ![Intel TDX 架构图](../diagrams/intel-tdx.svg)
+
 ## 核心概念
 
 - TD（Trust Domain）：受 TDX 保护的机密虚拟机。

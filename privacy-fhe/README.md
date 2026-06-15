@@ -5,6 +5,7 @@
 ## 架构图
 
 ![全同态加密（FHE） 架构图](../diagrams/privacy-fhe.svg)
+
 ## 核心概念
 
 - Plaintext：原始数据。
