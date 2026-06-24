@@ -34,6 +34,12 @@
 | 差分隐私 | 用可量化噪声限制单个样本影响 | [differential-privacy](./differential-privacy/README.md) |
 | 联邦学习 | 数据留在本地，交换模型更新 | [federated-learning](./federated-learning/README.md) |
 
+### 应用专题
+
+| 专题 | 核心问题 | 资料 |
+| --- | --- | --- |
+| TEE for ML / Confidential AI | 如何把 CPU/GPU TEE、远程证明、KMS、模型服务和输出治理组合起来保护 AI 推理/训练中的数据与模型权重 | [tee-for-ml](./tee-for-ml/README.md) |
+
 ## 架构图索引
 
 | 技术 | 架构图 |
@@ -56,6 +62,7 @@
 | 零知识证明（ZKP） | [SVG](./diagrams/privacy-zkp.svg) |
 | 差分隐私 | [SVG](./diagrams/differential-privacy.svg) |
 | 联邦学习 | [SVG](./diagrams/federated-learning.svg) |
+| TEE for ML / Confidential AI | [SVG](./diagrams/tee-for-ml.svg) |
 
 ## 总体对比
 
@@ -68,6 +75,8 @@
 | 主要优势 | TCB 小、密钥边界细 | 迁移成本低、适合通用云负载 | 运维集成好、KMS/IAM/审计完善 | 不依赖硬件供应商，安全定义清晰 |
 | 主要短板 | enclave 接口复杂、侧信道面大 | TCB 大于应用级、I/O 边界复杂 | 信任和可用性绑定云平台 | 性能、工程复杂度和输出泄露控制 |
 
+TEE for ML / Confidential AI 是一个横向应用分类，通常会把 VM 级 TEE、GPU TEE、云平台 attestation/KMS、容器编排和差分隐私等输出治理手段组合起来。它关注的不是“某一种 TEE 是否安全”，而是 AI 数据和模型权重从客户端、KMS、CPU、GPU、存储、日志到输出结果的端到端明文边界。
+
 ## 安全架构分类
 
 从安全架构角度，可以把本仓库技术按“保护边界在哪里”分成几类：
@@ -79,6 +88,7 @@
 | 受限子 VM/enclave | AWS Nitro Enclaves | 父实例内隔离 micro-VM | 父实例 root、代理进程 | Nitro attestation document、PCR |
 | 加速器 TEE | NVIDIA Confidential Computing | GPU HBM/执行路径 + CPU CVM | Host、PCIe 路径、GPU 管理面 | CPU quote + GPU evidence |
 | 托管隐私云系统 | Apple PCC、Google Confidential Space、Azure CVM | 云厂商产品化 TEE/证明/KMS | Operator、运维面、错误 workload | 透明日志、attestation token、vTPM/PCR、image digest |
+| 机密 AI 架构 | TEE for ML / Confidential AI | CPU/GPU TEE 内的模型服务、权重、prompt、训练数据和 KV cache | 云 operator、模型客户管理员、GPU/host 管理路径 | CPU quote、GPU evidence、workload digest、KMS release policy |
 | 密码学协议 | MPC、FHE、ZKP | 协议定义的输入/见证/密文 | 其他参与方、计算服务器、证明者 | 证明、密文、transcript、参数 |
 | 统计隐私 | 差分隐私、联邦学习 + DP | 输出分布或模型更新 | 查询者、服务器、模型接收方 | epsilon/delta、privacy accountant、聚合证明 |
 
@@ -132,6 +142,7 @@
 | IBM Secure Execution | IBM Z protected Linux VM | 跨平台通用性、guest 内漏洞、运维功能限制 |
 | Azure CVM | 云 VM + vTPM + Key Vault/attestation | Azure 策略配置、guest agent、数据离 VM 后边界 |
 | Google Confidential Space | 受证明容器 workload 的多方数据协作 | Workload 输出泄露、policy 过宽、镜像供应链 |
+| TEE for ML | AI 推理/训练中的 prompt、RAG 数据、模型权重、KV cache、梯度和 CPU/GPU 数据路径 | 输出泄露、prompt injection、模型提取、统计隐私攻击、GPU/多设备 I/O、KMS 策略错误 |
 | MPC | 多方输入和中间值 | 输出推断、DoS、恶意输入、元数据 |
 | FHE | 密文输入和中间计算 | 计算正确性、输出泄露、访问模式 |
 | ZKP | 私有 witness 和计算正确性证明 | 公开输入、约束错误、业务真实性 |
@@ -154,6 +165,7 @@
 - 需要尽量少改现有服务：优先评估 VM 级 TEE（TDX、SEV-SNP、Arm CCA）或云厂商 confidential VM。
 - 需要最小化可信计算基：评估 SGX/Keystone/Nitro Enclaves，但要准备 enclave 边界设计、OCALL/系统调用审计和侧信道缓解。
 - 需要保护 GPU 上的模型和数据：评估 NVIDIA Confidential Computing，并确认 CPU TEE、驱动、VBIOS、CUDA 和云实例组合在支持矩阵内。
+- 需要保护 AI 推理/训练的端到端链路：阅读 [TEE for ML / Confidential AI](./tee-for-ml/README.md)，同时设计 CPU quote、GPU evidence、KMS policy、模型权重密钥、用户数据密钥和输出治理。
 - 需要多方联合计算且不希望信任单一硬件/云：评估 MPC、FHE、ZKP，接受更高性能和工程成本。
 - 需要发布统计结果或训练模型：差分隐私常作为 TEE、联邦学习、数据 clean room 的补充，而不是替代加密。
 
@@ -181,3 +193,4 @@
 - NVIDIA Trusted Computing: https://docs.nvidia.com/nvtrust/index.html
 - Azure Confidential Computing: https://learn.microsoft.com/en-us/azure/confidential-computing/overview
 - Google Confidential Computing: https://docs.cloud.google.com/confidential-computing/
+- TEE for ML / Confidential AI 综述: https://aiwiki.ai/wiki/tee_for_ml

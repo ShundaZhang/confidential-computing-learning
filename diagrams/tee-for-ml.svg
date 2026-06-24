@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980">
+<defs>
+  <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#5b7fcb"/></marker>
+  <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#2f9e74"/></marker>
+  <marker id="arrowGray" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#5f6673"/></marker>
+  <pattern id="grid" width="42" height="42" patternUnits="userSpaceOnUse"><path d="M42 0H0V42" fill="none" stroke="#f2f4f7" stroke-width="1"/></pattern>
+</defs>
+<rect width="1600" height="980" fill="#ffffff"/>
+<rect width="1600" height="980" fill="url(#grid)" opacity="0.55"/>
+<style>
+  text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',Arial,sans-serif;}
+  .title{font-size:30px;font-weight:800;fill:#1f2933}
+  .subtitle{font-size:17px;fill:#8a96a8}
+  .section{font-size:18px;font-weight:800;fill:#2f3742}
+  .boxTitle{font-size:20px;font-weight:800;fill:#1f2933}
+  .boxTitleBlue{font-size:20px;font-weight:800;fill:#4f77d3}
+  .boxSub{font-size:15px;font-weight:500;fill:#687382}
+  .tag{font-size:13px;font-weight:800;fill:#8a96a8}
+  .labelBlue{font-size:14px;font-weight:800;fill:#5b7fcb}
+  .labelGreen{font-size:14px;font-weight:800;fill:#2f9e74}
+  .labelGray{font-size:14px;font-weight:800;fill:#5f6673}
+  .note{font-size:14px;font-weight:600;fill:#7c8798}
+</style>
+
+<text x="70" y="76" class="title">TEE for ML / Confidential AI 架构</text>
+<text x="70" y="112" class="subtitle">CPU/GPU TEE · remote attestation · KMS key release · protected model/data path · output governance</text>
+
+<rect x="1190" y="54" width="340" height="104" rx="10" fill="#ffffff" stroke="#d7dde7"/>
+<text x="1212" y="82" font-size="15" fill="#7c8798" font-weight="800">图例</text>
+<line x1="1212" y1="104" x2="1260" y2="104" stroke="#5b7fcb" stroke-width="4" marker-end="url(#arrowBlue)"/>
+<text x="1274" y="109" font-size="14" fill="#4b5563">证明 / 密钥释放</text>
+<line x1="1212" y1="130" x2="1260" y2="130" stroke="#2f9e74" stroke-width="4" marker-end="url(#arrowGreen)"/>
+<text x="1274" y="135" font-size="14" fill="#4b5563">加密数据 / 模型 / 输出</text>
+<line x1="1410" y1="104" x2="1458" y2="104" stroke="#5f6673" stroke-width="3" stroke-dasharray="7 7" marker-end="url(#arrowGray)"/>
+<text x="1470" y="109" font-size="14" fill="#4b5563">不可信控制</text>
+
+<text x="70" y="190" class="section">外部参与方</text>
+<line x1="70" y1="207" x2="1530" y2="207" stroke="#e8edf3"/>
+
+<rect x="90" y="238" width="300" height="108" rx="10" fill="#dcf8e5" stroke="#93b99d" stroke-width="2"/>
+<text x="108" y="264" class="tag">[DATA OWNER]</text>
+<text x="240" y="285" text-anchor="middle" class="boxTitle">User / Data Owner</text>
+<text x="240" y="316" text-anchor="middle" class="boxSub">prompt、RAG、训练数据</text>
+<text x="240" y="338" text-anchor="middle" class="boxSub">只向合格 workload 建立会话</text>
+
+<rect x="450" y="238" width="300" height="108" rx="10" fill="#dcf8e5" stroke="#93b99d" stroke-width="2"/>
+<text x="468" y="264" class="tag">[MODEL OWNER]</text>
+<text x="600" y="285" text-anchor="middle" class="boxTitle">Encrypted Weights</text>
+<text x="600" y="316" text-anchor="middle" class="boxSub">模型权重、adapter、tokenizer</text>
+<text x="600" y="338" text-anchor="middle" class="boxSub">密钥按证明策略释放</text>
+
+<rect x="1160" y="238" width="330" height="108" rx="10" fill="#fff3ce" stroke="#c8a858" stroke-width="2"/>
+<text x="1178" y="264" class="tag">[VERIFY]</text>
+<text x="1325" y="285" text-anchor="middle" class="boxTitle">Verifier / KMS</text>
+<text x="1325" y="316" text-anchor="middle" class="boxSub">校验 CPU quote + GPU evidence</text>
+<text x="1325" y="338" text-anchor="middle" class="boxSub">绑定 nonce、digest、TCB、policy</text>
+
+<text x="70" y="402" class="section">运行时边界</text>
+<line x1="70" y1="419" x2="1530" y2="419" stroke="#e8edf3"/>
+
+<rect x="260" y="450" width="560" height="238" rx="14" fill="#eef7ff" stroke="#5b7fcb" stroke-width="2.5"/>
+<text x="282" y="480" class="tag">[CPU TEE / CVM]</text>
+<text x="540" y="483" text-anchor="middle" class="boxTitleBlue">Confidential AI Runtime</text>
+<text x="540" y="512" text-anchor="middle" class="boxSub">TDX / SEV-SNP / CCA / Secure Execution</text>
+
+<rect x="292" y="536" width="150" height="94" rx="9" fill="#ffffff" stroke="#8aa7d8" stroke-width="1.8"/>
+<text x="367" y="571" text-anchor="middle" class="boxTitle" font-size="18">Attestation</text>
+<text x="367" y="598" text-anchor="middle" class="boxSub">agent / vTPM</text>
+<text x="367" y="618" text-anchor="middle" class="boxSub">PCR / nonce</text>
+
+<rect x="470" y="536" width="150" height="94" rx="9" fill="#ffffff" stroke="#8aa7d8" stroke-width="1.8"/>
+<text x="545" y="571" text-anchor="middle" class="boxTitle" font-size="18">Model</text>
+<text x="545" y="598" text-anchor="middle" class="boxSub">loader</text>
+<text x="545" y="618" text-anchor="middle" class="boxSub">key unwrap</text>
+
+<rect x="648" y="536" width="140" height="94" rx="9" fill="#ffffff" stroke="#8aa7d8" stroke-width="1.8"/>
+<text x="718" y="571" text-anchor="middle" class="boxTitle" font-size="18">Service</text>
+<text x="718" y="598" text-anchor="middle" class="boxSub">vLLM/Triton</text>
+<text x="718" y="618" text-anchor="middle" class="boxSub">API guard</text>
+
+<rect x="860" y="450" width="330" height="238" rx="14" fill="#ffffff" stroke="#5b7fcb" stroke-width="2.5"/>
+<text x="882" y="480" class="tag">[GPU TEE]</text>
+<text x="1025" y="483" text-anchor="middle" class="boxTitleBlue">GPU CC Mode</text>
+<text x="1025" y="516" text-anchor="middle" class="boxSub">H100/H200/Blackwell 等</text>
+<text x="1025" y="544" text-anchor="middle" class="boxSub">protected HBM</text>
+<text x="1025" y="566" text-anchor="middle" class="boxSub">firmware / VBIOS measurement</text>
+<text x="1025" y="588" text-anchor="middle" class="boxSub">KV cache、activation、gradient</text>
+<rect x="900" y="615" width="250" height="42" rx="8" fill="#eef2ff" stroke="#8aa7d8"/>
+<text x="1025" y="642" text-anchor="middle" class="labelBlue">GPU attestation evidence</text>
+
+<rect x="1240" y="450" width="250" height="238" rx="14" fill="#ffe7e7" stroke="#d69a9a" stroke-width="2.2"/>
+<text x="1262" y="480" class="tag">[UNTRUSTED]</text>
+<text x="1365" y="483" text-anchor="middle" class="boxTitle">Host / VMM</text>
+<text x="1365" y="516" text-anchor="middle" class="boxSub">cloud operator</text>
+<text x="1365" y="538" text-anchor="middle" class="boxSub">host kernel / admin</text>
+<text x="1365" y="560" text-anchor="middle" class="boxSub">storage / network</text>
+<text x="1365" y="600" text-anchor="middle" class="boxSub">可调度和拒绝服务</text>
+<text x="1365" y="622" text-anchor="middle" class="boxSub">不应看到明文</text>
+
+<polyline points="390,292 390,430 260,540" fill="none" stroke="#2f9e74" stroke-width="3.2" marker-end="url(#arrowGreen)"/>
+<rect x="230" y="382" width="136" height="28" rx="7" fill="#ffffff" stroke="#2f9e74" stroke-width="1.5"/>
+<text x="298" y="401" text-anchor="middle" class="labelGreen">encrypted input</text>
+
+<polyline points="600,346 600,438 520,536" fill="none" stroke="#2f9e74" stroke-width="3.2" marker-end="url(#arrowGreen)"/>
+<rect x="540" y="396" width="136" height="28" rx="7" fill="#ffffff" stroke="#2f9e74" stroke-width="1.5"/>
+<text x="608" y="415" text-anchor="middle" class="labelGreen">cipher weights</text>
+
+<line x1="620" y1="583" x2="860" y2="583" stroke="#5b7fcb" stroke-width="3.2" marker-end="url(#arrowBlue)"/>
+<rect x="674" y="554" width="132" height="28" rx="7" fill="#ffffff" stroke="#5b7fcb" stroke-width="1.5"/>
+<text x="740" y="573" text-anchor="middle" class="labelBlue">protected I/O</text>
+
+<polyline points="420,536 420,430 1040,430 1160,315" fill="none" stroke="#5b7fcb" stroke-width="3.2" marker-end="url(#arrowBlue)"/>
+<rect x="724" y="389" width="164" height="28" rx="7" fill="#ffffff" stroke="#5b7fcb" stroke-width="1.5"/>
+<text x="806" y="408" text-anchor="middle" class="labelBlue">CPU quote / digest</text>
+
+<polyline points="1088,615 1130,615 1130,390 1160,336" fill="none" stroke="#5b7fcb" stroke-width="3.2" marker-end="url(#arrowBlue)"/>
+<rect x="1078" y="430" width="128" height="28" rx="7" fill="#ffffff" stroke="#5b7fcb" stroke-width="1.5"/>
+<text x="1142" y="449" text-anchor="middle" class="labelBlue">GPU evidence</text>
+
+<polyline points="1160,330 1025,390 700,390 620,536" fill="none" stroke="#5b7fcb" stroke-width="3.2" marker-end="url(#arrowBlue)"/>
+<rect x="875" y="358" width="118" height="28" rx="7" fill="#ffffff" stroke="#5b7fcb" stroke-width="1.5"/>
+<text x="934" y="377" text-anchor="middle" class="labelBlue">release keys</text>
+
+<polyline points="470,630 240,630 240,346" fill="none" stroke="#2f9e74" stroke-width="3.2" marker-end="url(#arrowGreen)"/>
+<rect x="310" y="668" width="142" height="28" rx="7" fill="#ffffff" stroke="#2f9e74" stroke-width="1.5"/>
+<text x="381" y="687" text-anchor="middle" class="labelGreen">encrypted result</text>
+
+<line x1="1240" y1="548" x2="1190" y2="548" stroke="#5f6673" stroke-width="3" stroke-dasharray="8 8" marker-end="url(#arrowGray)"/>
+<line x1="1240" y1="610" x2="1190" y2="610" stroke="#5f6673" stroke-width="3" stroke-dasharray="8 8" marker-end="url(#arrowGray)"/>
+<rect x="1210" y="570" width="128" height="28" rx="7" fill="#ffffff" stroke="#5f6673" stroke-width="1.5"/>
+<text x="1274" y="589" text-anchor="middle" class="labelGray">metadata only</text>
+
+<text x="70" y="742" class="section">TEE primitives 在 ML 中的映射</text>
+<line x1="70" y1="759" x2="1530" y2="759" stroke="#e8edf3"/>
+<rect x="90" y="785" width="1460" height="126" rx="10" fill="#f8fafc" stroke="#5f6673" stroke-width="2.4"/>
+
+<rect x="120" y="820" width="430" height="62" rx="10" fill="#eee7ff" stroke="#a796d8" stroke-width="2"/>
+<text x="140" y="846" class="tag">[MEM]</text>
+<text x="335" y="845" text-anchor="middle" class="boxTitle">Protected Memory</text>
+<text x="335" y="873" text-anchor="middle" class="boxSub">权重、prompt、KV cache、梯度、checkpoint</text>
+
+<rect x="585" y="820" width="430" height="62" rx="10" fill="#eee7ff" stroke="#a796d8" stroke-width="2"/>
+<text x="605" y="846" class="tag">[ATT]</text>
+<text x="800" y="845" text-anchor="middle" class="boxTitle">Remote Attestation</text>
+<text x="800" y="873" text-anchor="middle" class="boxSub">CPU quote + GPU evidence + workload digest</text>
+
+<rect x="1050" y="820" width="430" height="62" rx="10" fill="#eee7ff" stroke="#a796d8" stroke-width="2"/>
+<text x="1070" y="846" class="tag">[I/O]</text>
+<text x="1265" y="845" text-anchor="middle" class="boxTitle">Secure I/O</text>
+<text x="1265" y="873" text-anchor="middle" class="boxSub">CPU-GPU、存储、网络、输出通道逐段保护</text>
+
+<text x="70" y="952" font-size="14" fill="#5b7fcb" font-weight="800">TCB：</text>
+<text x="115" y="952" class="note">CPU/GPU silicon、firmware、guest image、driver/runtime、model service、verifier/KMS policy；host/operator 不在明文边界内</text>
+</svg>
