@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980">
+<defs>
+  <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#5b7fcb"/></marker>
+  <pattern id="grid" width="42" height="42" patternUnits="userSpaceOnUse"><path d="M42 0H0V42" fill="none" stroke="#f2f4f7" stroke-width="1"/></pattern>
+</defs>
+<rect width="1600" height="980" fill="#ffffff"/>
+<rect width="1600" height="980" fill="url(#grid)" opacity="0.55"/>
+<style>
+  text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',Arial,sans-serif;}
+  .title{font-size:30px;font-weight:800;fill:#1f2933}
+  .subtitle{font-size:17px;fill:#8a96a8}
+  .laneTitle{font-size:20px;font-weight:800;fill:#1f2933}
+  .boxTitle{font-size:19px;font-weight:800;fill:#1f2933}
+  .boxSub{font-size:14px;font-weight:500;fill:#687382}
+  .tag{font-size:13px;font-weight:800;fill:#8a96a8}
+  .note{font-size:14px;font-weight:600;fill:#7c8798}
+</style>
+
+<text x="70" y="76" class="title">TEE for ML 产品/方案形态图</text>
+<text x="70" y="112" class="subtitle">从固定 AI 服务到云上 confidential GPU、企业控制面、Kubernetes service mesh 和小 TCB sidecar</text>
+
+<rect x="70" y="155" width="1460" height="92" rx="10" fill="#f8fafc" stroke="#d7dde7"/>
+<text x="95" y="184" class="tag">共同安全模式</text>
+<text x="95" y="216" class="laneTitle">测量 workload 与硬件 TCB → verifier/KMS 校验 CPU/GPU/容器/manifest evidence → 释放数据密钥或模型密钥 → 在 TEE 边界内运行 AI 负载</text>
+
+<line x1="800" y1="247" x2="800" y2="300" stroke="#5b7fcb" stroke-width="3" marker-end="url(#arrowBlue)"/>
+
+<rect x="70" y="305" width="275" height="482" rx="14" fill="#eef7ff" stroke="#8aa7d8" stroke-width="2.2"/>
+<text x="96" y="336" class="tag">[FIXED AI SERVICE]</text>
+<text x="207.5" y="366" text-anchor="middle" class="laneTitle">固定 AI 产品</text>
+<text x="207.5" y="396" text-anchor="middle" class="boxSub">服务商控制 workload</text>
+<text x="207.5" y="418" text-anchor="middle" class="boxSub">客户端验证服务版本</text>
+
+<rect x="100" y="455" width="215" height="88" rx="9" fill="#ffffff" stroke="#8aa7d8"/>
+<text x="207.5" y="485" text-anchor="middle" class="boxTitle">Apple PCC</text>
+<text x="207.5" y="514" text-anchor="middle" class="boxSub">透明日志 / 固定 PCC build</text>
+
+<rect x="100" y="570" width="215" height="112" rx="9" fill="#ffffff" stroke="#8aa7d8"/>
+<text x="207.5" y="600" text-anchor="middle" class="boxTitle">Anthropic CI</text>
+<text x="207.5" y="629" text-anchor="middle" class="boxSub">SEV-SNP/TDX + GPU CC</text>
+<text x="207.5" y="651" text-anchor="middle" class="boxSub">attested model loader</text>
+
+<text x="207.5" y="735" text-anchor="middle" class="note">强项：服务端闭环强</text>
+<text x="207.5" y="760" text-anchor="middle" class="note">短板：客户自定义少</text>
+
+<rect x="375" y="305" width="275" height="482" rx="14" fill="#dcf8e5" stroke="#93b99d" stroke-width="2.2"/>
+<text x="401" y="336" class="tag">[CLOUD GPU PRIMITIVE]</text>
+<text x="512.5" y="366" text-anchor="middle" class="laneTitle">云上 GPU TEE</text>
+<text x="512.5" y="396" text-anchor="middle" class="boxSub">客户控制镜像/模型栈</text>
+<text x="512.5" y="418" text-anchor="middle" class="boxSub">云 KMS/attestation 集成</text>
+
+<rect x="405" y="455" width="215" height="88" rx="9" fill="#ffffff" stroke="#93b99d"/>
+<text x="512.5" y="485" text-anchor="middle" class="boxTitle">Azure Confidential GPU</text>
+<text x="512.5" y="514" text-anchor="middle" class="boxSub">SEV-SNP + H100 CC</text>
+
+<rect x="405" y="570" width="215" height="112" rx="9" fill="#ffffff" stroke="#93b99d"/>
+<text x="512.5" y="600" text-anchor="middle" class="boxTitle">Google Conf Space</text>
+<text x="512.5" y="629" text-anchor="middle" class="boxSub">TDX + H100 preview</text>
+<text x="512.5" y="651" text-anchor="middle" class="boxSub">data owner policy</text>
+
+<text x="512.5" y="735" text-anchor="middle" class="note">强项：云生态接入快</text>
+<text x="512.5" y="760" text-anchor="middle" class="note">短板：支持矩阵复杂</text>
+
+<rect x="680" y="305" width="275" height="482" rx="14" fill="#fff3ce" stroke="#c8a858" stroke-width="2.2"/>
+<text x="706" y="336" class="tag">[ENTERPRISE CONTROL PLANE]</text>
+<text x="817.5" y="366" text-anchor="middle" class="laneTitle">企业 KMS / 控制面</text>
+<text x="817.5" y="396" text-anchor="middle" class="boxSub">策略、密钥、证明产品化</text>
+<text x="817.5" y="418" text-anchor="middle" class="boxSub">适合混合云/企业 AI</text>
+
+<rect x="710" y="455" width="215" height="88" rx="9" fill="#ffffff" stroke="#c8a858"/>
+<text x="817.5" y="485" text-anchor="middle" class="boxTitle">Fortanix Conf AI</text>
+<text x="817.5" y="514" text-anchor="middle" class="boxSub">DSM/KMS + NVIDIA CC</text>
+
+<rect x="710" y="570" width="215" height="112" rx="9" fill="#ffffff" stroke="#c8a858"/>
+<text x="817.5" y="600" text-anchor="middle" class="boxTitle">Anjuna Seaglass</text>
+<text x="817.5" y="629" text-anchor="middle" class="boxSub">lift-and-shift Linux apps</text>
+<text x="817.5" y="651" text-anchor="middle" class="boxSub">Policy Manager 放 secret</text>
+
+<text x="817.5" y="735" text-anchor="middle" class="note">强项：企业落地能力强</text>
+<text x="817.5" y="760" text-anchor="middle" class="note">短板：平台进入信任链</text>
+
+<rect x="985" y="305" width="275" height="482" rx="14" fill="#f3efff" stroke="#a796d8" stroke-width="2.2"/>
+<text x="1011" y="336" class="tag">[CONFIDENTIAL KUBERNETES]</text>
+<text x="1122.5" y="366" text-anchor="middle" class="laneTitle">K8s / Service Mesh</text>
+<text x="1122.5" y="396" text-anchor="middle" class="boxSub">把多组件拓扑做成证明对象</text>
+<text x="1122.5" y="418" text-anchor="middle" class="boxSub">适合 RAG / pipeline / FL</text>
+
+<rect x="1015" y="455" width="215" height="88" rx="9" fill="#ffffff" stroke="#a796d8"/>
+<text x="1122.5" y="485" text-anchor="middle" class="boxTitle">Edgeless</text>
+<text x="1122.5" y="514" text-anchor="middle" class="boxSub">Marblerun / Contrast</text>
+
+<rect x="1015" y="570" width="215" height="112" rx="9" fill="#ffffff" stroke="#a796d8"/>
+<text x="1122.5" y="600" text-anchor="middle" class="boxTitle">Confidential Containers</text>
+<text x="1122.5" y="629" text-anchor="middle" class="boxSub">Kata PodVM + Trustee</text>
+<text x="1122.5" y="651" text-anchor="middle" class="boxSub">encrypted image / secrets</text>
+
+<text x="1122.5" y="735" text-anchor="middle" class="note">强项：云原生工作流</text>
+<text x="1122.5" y="760" text-anchor="middle" class="note">短板：策略和动态面复杂</text>
+
+<rect x="1290" y="305" width="240" height="482" rx="14" fill="#ffe7e7" stroke="#d69a9a" stroke-width="2.2"/>
+<text x="1316" y="336" class="tag">[SMALL TCB SIDECAR]</text>
+<text x="1410" y="366" text-anchor="middle" class="laneTitle">小 TCB Sidecar</text>
+<text x="1410" y="396" text-anchor="middle" class="boxSub">只保护密钥或敏感子逻辑</text>
+<text x="1410" y="418" text-anchor="middle" class="boxSub">与外部模型服务组合</text>
+
+<rect x="1320" y="455" width="180" height="112" rx="9" fill="#ffffff" stroke="#d69a9a"/>
+<text x="1410" y="485" text-anchor="middle" class="boxTitle">AWS Nitro</text>
+<text x="1410" y="514" text-anchor="middle" class="boxSub">Enclaves / vsock</text>
+<text x="1410" y="536" text-anchor="middle" class="boxSub">KMS key broker</text>
+
+<rect x="1320" y="595" width="180" height="88" rx="9" fill="#ffffff" stroke="#d69a9a"/>
+<text x="1410" y="625" text-anchor="middle" class="boxTitle">SGX/Keystone</text>
+<text x="1410" y="654" text-anchor="middle" class="boxSub">model loader / signer</text>
+
+<text x="1410" y="735" text-anchor="middle" class="note">强项：边界窄、TCB 小</text>
+<text x="1410" y="760" text-anchor="middle" class="note">短板：不覆盖完整 GPU 栈</text>
+
+<rect x="70" y="835" width="1460" height="92" rx="10" fill="#f8fafc" stroke="#5f6673" stroke-width="2.3"/>
+<text x="96" y="865" class="tag">选型要点</text>
+<text x="96" y="897" class="note">固定服务看透明发布和不可定向化；云 GPU 看 CPU quote + GPU evidence + 镜像 digest；企业控制面看 KMS/策略审计；K8s 方案看 manifest/PodVM/Trustee；sidecar 看父实例协议和重放保护。</text>
+</svg>

@@ -63,6 +63,7 @@
 | 差分隐私 | [SVG](./diagrams/differential-privacy.svg) |
 | 联邦学习 | [SVG](./diagrams/federated-learning.svg) |
 | TEE for ML / Confidential AI | [SVG](./diagrams/tee-for-ml.svg) |
+| TEE for ML 产品/方案形态 | [SVG](./diagrams/tee-for-ml-solution-landscape.svg) |
 
 ## 总体对比
 

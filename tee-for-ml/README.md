@@ -2,11 +2,13 @@
 
 TEE for ML，也常被称为 Confidential AI 或 confidential inference，是把硬件可信执行环境用于机器学习训练、推理和模型托管的一类架构模式。它的目标不是发明一种新的 TEE，而是把 CPU TEE、GPU TEE、远程证明、密钥释放、模型服务运行时和输出治理组合起来，让敏感数据、模型权重和执行代码只在可证明的受保护边界内以明文出现。
 
-本文主要参考 AI Wiki 的 [Trusted Execution Environments for machine learning](https://aiwiki.ai/wiki/tee_for_ml)（页面标注 2026-06-07 更新）并结合 NVIDIA、Apple、Google Confidential Space 和 Confidential Containers 的官方资料整理。AI Wiki 页面本身标注为 Needs citations，因此这里将其作为综述线索，而不是唯一事实来源。
+本文主要参考 AI Wiki 的 [Trusted Execution Environments for machine learning](https://aiwiki.ai/wiki/tee_for_ml)（页面标注 2026-06-07 更新）并结合 NVIDIA、Apple、Google Confidential Space、AWS Nitro Enclaves、Fortanix、Edgeless、Anjuna 和 Confidential Containers 等官方资料整理。AI Wiki 页面本身标注为 Needs citations，因此这里将其作为综述线索，而不是唯一事实来源。
 
 ## 架构图
 
 ![TEE for ML 架构图](../diagrams/tee-for-ml.svg)
+
+![TEE for ML 方案形态图](../diagrams/tee-for-ml-solution-landscape.svg)
 
 ## 为什么 ML 需要 TEE
 
@@ -127,18 +129,166 @@ GPU TEE 在策略上至少要回答：
 
 这个流程的关键不是“有一个 TEE”，而是证明、密钥和数据流必须绑定到同一个被允许的软硬件组合。
 
-## 典型系统与落地形态
+## 主流产品/方案全景
 
-| 系统/方案 | 主要形态 | TEE for ML 关注点 |
-| --- | --- | --- |
-| Apple Private Cloud Compute | Apple 自建云 AI 节点 | 设备只向可证明且在透明日志中的 PCC 软件发送请求；强调 stateless、无特权运行时访问、非定向化和可验证透明度 |
-| Anthropic Confidential Inference | Confidential VM + NVIDIA CC GPU 的模型服务设计 | 通过 attested model loader 和受控 release pipeline 保护用户请求与模型权重，面向高价值模型推理 |
-| Azure Confidential GPU/CVM | 云上 SEV-SNP/TDX + H100/H200 等组合 | 云 KMS、guest attestation、GPU CC 与企业模型服务集成 |
-| Google Confidential Space | Confidential VM + hardened OS + 容器 workload | 数据拥有方根据 attestation claims 只向约定容器释放敏感数据，适合多方数据协作和 ML 分析 |
-| AWS Nitro Enclaves | EC2 父实例中的隔离 microVM | 常用于 KMS 绑定解密、签名和密钥代理；可作为 AI 系统中的密钥隔离组件 |
-| Fortanix / Anjuna / Edgeless / CoCo | 商业或开源编排层 | 把 attestation、KMS、容器镜像解密、mTLS、Kubernetes 和 TEE 运行时打包成可运营平台 |
+AI Wiki 原文的 comparative summary 把当前 TEE for ML 生态分成云厂商产品、AI 服务架构、企业 KMS/编排平台和开源 confidential Kubernetes 几类。下面这张表覆盖原文 summary 中的 8 项：Apple PCC、Anthropic Confidential Inference、Azure Confidential GPU、Google Confidential Space + CC GPU、AWS Nitro Enclaves、Fortanix Confidential AI、Edgeless Marblerun/Contrast、Confidential Containers；并补入同一段落中提到但没有进入 summary 表的 Anjuna Seaglass。状态/成熟度以 AI Wiki 页面 2026-06-07 的整理为准，落地前仍应复核厂商最新文档。
 
-这些系统的共同模式是“先证明，后放密钥”。差异在于证明材料由谁产生、策略由谁管理、代码是否开放可审计、以及用户是否能自行验证。
+| 系统/方案 | TEE 技术 | 工作负载 | 原文状态/成熟度 | 架构形态 | 主要保护对象 | 关键注意点 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Apple Private Cloud Compute | Apple-silicon Secure Enclave、Apple 自定义云节点 | Apple Intelligence 云侧推理 | iOS 18 起生产使用 | 固定厂商 AI 服务，客户端只向可证明 PCC build 发送请求 | 用户请求、上下文、云侧推理中间状态 | 不面向任意第三方 workload；依赖 Apple 透明日志、设备策略和固定软件栈 |
+| Anthropic Confidential Inference | AMD SEV-SNP / Intel TDX + NVIDIA H100/H200 CC | 选定 Claude 推理 | 2025-06 发布架构论文 | 模型服务参考架构，API server + attested model loader + confidential inference VM | 用户 prompt、输出、模型权重、release key | 重点是推理与权重保护；依赖 CI/release 策略、GPU 证明和云实例支持 |
+| Azure Confidential GPU / CVM | AMD SEV-SNP + NVIDIA H100 CC，部分场景结合 TDX/CVM 能力 | 客户自管 AI workload | 原文标注 GA | 云平台 confidential GPU 产品 | 企业数据、模型权重、GPU HBM 中间状态 | 需要严格核对实例规格、驱动、CUDA、GPU CC mode、Azure attestation/KMS 策略 |
+| Google Confidential Space + CC GPU | Intel TDX + NVIDIA H100 CC，Confidential Space attestation claims | 客户自管 AI workload、多方数据协作 | 原文标注 TDX+H100 preview | 受证明容器 workload + 数据拥有方 policy + cloud KMS/attestation | 多方数据、模型评估、训练/分析输入 | 重点是 data owner policy；preview 能力、claim 精度、输出路径和镜像 digest 是核心风险 |
+| AWS Nitro Enclaves | Nitro Hypervisor 隔离 microVM | 通用机密 workload、KMS 代理、签名/解密服务 | 2020 起 GA | 父 EC2 中的受限子 VM，无网络/无持久磁盘，通过 vsock 通信 | 密钥、token、证书、模型密钥代理 | 不是完整 GPU 推理栈；适合作为 AI 系统里的小 TCB sidecar 或 key broker |
+| Fortanix Confidential AI | NVIDIA CC GPU + Fortanix Confidential Computing Manager + Fortanix DSM/KMS | 企业模型 IP 保护、企业 AI factories 推理 | 原文标注 GA | 商业 KMS/attestation/control plane，面向混合云和本地 AI 工厂 | 第三方模型权重、客户敏感输入、推理密钥 | 平台策略和 Fortanix 控制面进入信任链；适合“模型方和企业互不完全信任”的部署 |
+| Edgeless Marblerun / Contrast | Marblerun: Intel SGX；Contrast: Intel TDX / AMD SEV-SNP CVM | confidential service mesh、Kubernetes confidential apps、AI pipeline | 开源/商业支持 | Manifest 驱动的全部署证明、Coordinator/CA、mTLS service mesh、secret provisioning | 微服务间数据、pipeline secret、模型/数据处理服务 | Marblerun 偏 SGX enclave mesh，Contrast 偏 CVM/Kata/Kubernetes；应用漏洞和输出仍需治理 |
+| Confidential Containers (CoCo) | Kata Containers PodVM + TDX / SEV-SNP / IBM Secure Execution 等 | Confidential Kubernetes、RAG、推理、微调、联邦学习 | CNCF sandbox | 每个 Pod 运行在 TEE microVM 内，guest 内拉取/解密镜像，AA/CDH/Trustee 完成证明和密钥释放 | Pod 内数据、镜像层、secret、RAG 文档库、FL client/aggregator | Pod-centric TCB；需配置 Trustee policy、encrypted image、composite attestation 和 GPU evidence |
+| Anjuna Seaglass | Intel SGX/TDX、AMD SEV-SNP、AWS Nitro Enclaves 等 | 无代码改造的 Linux 应用、SaaS/ISV 安全 AI | 商业平台 | 把现有应用封装成 Anjuna Confidential Containers，Policy Manager 根据证明放 secret | 现有应用内存、TLS key、数据库/AI 服务 secret、客户数据 | 优势是 lift-and-shift；代价是平台抽象和策略管理成为信任边界的一部分 |
+
+这些系统的共同模式是“先证明，后放密钥”。差异主要在四个维度：
+
+- 谁控制 workload：Apple/Anthropic 这类固定服务由服务商控制；Azure/Google/CoCo/Contrast 让客户控制镜像；Fortanix/Anjuna 提供企业控制面；Nitro Enclaves 常作为父实例里的小隔离组件。
+- 证明粒度是什么：PCC build、confidential VM measurement、container digest、Kubernetes manifest、SGX MRENCLAVE、GPU firmware/VBIOS evidence、vTPM PCR 都可能成为策略输入。
+- 明文在哪里出现：固定 AI 服务只在厂商 TEE 内；云 GPU 服务在客户 CVM/GPU 内；CoCo/Contrast 在 PodVM/CVM 内；Nitro 常只在小型 key service 内。
+- 输出如何管：TEE 只能约束运行时明文访问，不能自动阻止模型通过合法输出泄露训练样本、prompt、RAG 文档或模型能力。
+
+## 逐项方案分析
+
+### Apple Private Cloud Compute
+
+Apple PCC 是“产品化固定 AI 服务”路线。用户设备在本地判断请求能否本地处理；需要云侧能力时，请求被发送到 Apple 自建的 PCC 节点。PCC 的安全重点不是让用户部署任意模型，而是让 Apple Intelligence 的云侧推理具备可验证的隐私边界。
+
+架构关键点：
+
+- 固定 workload：PCC 节点运行 Apple 发布的受限软件栈，而不是客户自定义容器。
+- 可验证透明度：Apple 发布生产 PCC build，客户端和研究者可以验证实际运行软件与公开版本的关系。
+- 无特权运行时访问：运维人员不能通过传统 debug、shell、日志或管理通道读取请求明文。
+- 非定向化：系统避免把特定用户请求定向到特定可被攻击或特殊配置的节点。
+
+适合场景是个人设备 AI 请求的云侧扩展；不适合企业自带模型、自带容器或多云部署。它的边界强在“固定软件 + 设备生态 + 透明发布”，弱在不可迁移、不可自定义，并且仍然不解决模型输出层面的统计泄露。
+
+### Anthropic Confidential Inference
+
+Anthropic 的方案更像“前沿模型服务的参考架构”。它把用户 API 入口、数据解密、模型权重解密和 GPU 推理拆开，让 model loader 作为高价值小 TCB，只在 CPU/GPU evidence 满足策略后解密模型权重。
+
+架构关键点：
+
+- 推理 VM 运行在 SEV-SNP 或 TDX 这类 confidential VM 中，并使用 H100/H200 GPU CC mode。
+- Model loader 接收 KMS/release pipeline 放出的权重密钥，验证后加载模型。
+- API server 负责用户侧协议、鉴权、请求解密和响应加密，降低 model loader 暴露面。
+- Release 过程绑定 CI、代码审查和签名策略，用来防止未经批准的软件版本拿到权重。
+- 设计同时关注用户 prompt 隐私和模型权重防盗，对应高安全等级模型部署的现实需求。
+
+这类架构的核心不是“把所有东西塞进一个 TEE”，而是把权重解密点、用户数据解密点、GPU evidence 和 release policy 绑定起来。主要风险是 release pipeline、API server、模型服务代码和输出通道仍然很关键；如果这些组件被允许输出任意数据，TEE 也会按策略“安全地执行错误行为”。
+
+### Azure Confidential GPU / CVM
+
+Azure 的路线是“云平台 primitive 产品化”：把 confidential VM、guest attestation、Key Vault/Managed HSM、NVIDIA H100 CC 等能力组合成客户可部署的云实例。与 PCC 或 Anthropic 不同，Azure 更偏 IaaS/PaaS 基础能力，客户可以迁移自己的模型服务栈。
+
+架构关键点：
+
+- CPU 侧依赖 SEV-SNP/TDX 等 confidential VM 隔离 host 和 VMM。
+- GPU 侧依赖 H100/H200 的 CC mode、GPU attestation 和受保护 HBM。
+- 密钥释放可绑定 Azure attestation token、vTPM/PCR、镜像 digest、实例属性和客户策略。
+- 与 Azure Key Vault、Managed Identity、AKS/容器生态结合后，可以形成企业推理平台。
+
+适合已有 Azure 治理体系的企业，把模型服务迁移到 confidential GPU 上。关键坑点是支持矩阵：实例型号、区域、镜像、guest kernel、NVIDIA 驱动、CUDA、GPU firmware、CC mode、attestation 工具都要匹配。只验证 VM 而不验证 GPU，或只验证实例类型而不验证 workload digest，都不足以保护端到端 AI 数据流。
+
+### Google Confidential Space + CC GPU
+
+Google Confidential Space 的核心是“数据拥有方策略驱动的受证明容器”。它特别适合多方数据协作：operator 可以部署 workload，但数据拥有方只根据 attestation claims 释放数据或密钥。加入 TDX + H100 CC 后，这个模型可以扩展到 GPU AI workload。
+
+架构关键点：
+
+- Workload 是容器镜像，运行在 Confidential Space 环境和 confidential VM 之上。
+- Attestation token 表达硬件 TEE、镜像 digest、启动参数、service account、project 等 claims。
+- 数据拥有方按 policy 判断是否释放 dataset key、RAG 文档 key、模型评估数据或训练数据。
+- 对 GPU workload，还需要把 GPU evidence 与 CPU/容器 evidence 绑定，避免“合格容器 + 不合格加速器路径”。
+
+适合 clean room、联合分析、模型评估、机密训练和多方数据集上的 AI 处理。风险集中在 policy 精度和输出控制：如果 policy 只绑定项目或镜像 tag，而不是 immutable digest 和启动参数，operator 可能替换 workload；如果输出 sink 太宽，可信 workload 仍可能把原始数据写出去。
+
+### AWS Nitro Enclaves
+
+Nitro Enclaves 不是完整的 GPU confidential inference 平台，而是“父实例内的小型隔离 microVM”。它没有持久磁盘和普通网络，通常通过 vsock 与父实例通信。对 AI 系统而言，它常见的角色是密钥代理、签名服务、token broker 或敏感后处理组件。
+
+架构关键点：
+
+- Enclave image file 产生 PCR，KMS policy 可绑定 attestation document。
+- 父实例负责网络、磁盘和请求转发，但理论上不应拿到 enclave 内明文密钥。
+- Enclave 适合解包模型密钥、签名审计记录、处理证书或做小规模敏感逻辑。
+- 父实例仍可 DoS、重放请求、观察流量元数据，因此应用协议必须有 nonce、session binding 和重放保护。
+
+在 TEE for ML 中，Nitro Enclaves 更适合做“密钥闸门”而不是直接跑大模型。比如父实例或 GPU 服务请求解密权重时，enclave 先验证外部证明或业务策略，再通过 vsock 返回短期会话密钥。它的优点是小 TCB 和 AWS KMS 集成成熟；短板是不能单独保护 GPU HBM 或完整模型服务栈。
+
+### Fortanix Confidential AI
+
+Fortanix 走的是“企业级控制面 + NVIDIA confidential GPU”的商业平台路线。它把 Confidential Computing Manager、Data Security Manager/KMS、policy enforcement 和 NVIDIA CC GPU 组合起来，解决模型方和企业方互不完全信任的问题。
+
+架构关键点：
+
+- 模型方发布加密权重，企业在本地、混合云或 AI factory 中运行推理。
+- Fortanix 控制面验证 runtime、GPU/TEE 状态和 workload policy 后释放模型密钥。
+- 企业数据留在企业环境中，模型方不应看到客户 prompt 和输出。
+- 模型方也不需要把权重明文交给企业管理员，降低模型复制和二次分发风险。
+
+这个方案适合“第三方高价值模型进入企业私有环境”的商业场景：模型方需要 IP 保护，企业需要数据主权。安全边界除了 CPU/GPU TEE，还包括 Fortanix KMS、策略审批、密钥生命周期和审计系统。风险在于平台控制面本身进入关键路径，策略配置错误会直接变成密钥释放错误。
+
+### Edgeless Marblerun / Contrast
+
+Edgeless 是原文里漏掉后影响很大的一类：它不是单个 AI 模型服务，而是 confidential workload 的 service mesh / Kubernetes 平台。Marblerun 早期面向 SGX enclave 集群，Contrast 则把思路扩展到 TDX/SEV-SNP CVM 和 Kubernetes。
+
+Marblerun 架构关键点：
+
+- 把多个 SGX enclave 服务组织成 “Marbles”，每个 Marble 可以用 EGo、Gramine 或 Occlum 构建。
+- 用 manifest 描述全部署的预期状态，包括每个服务的身份、measurement、secret、恢复策略和连接关系。
+- Coordinator 对每个 Marble 做远程证明，证明通过后分发 secret，并为服务间通信配置 mTLS。
+- 对外提供一个“整个部署符合 manifest”的 succinct attestation，而不是要求用户逐个验证 enclave。
+
+Contrast 架构关键点：
+
+- 通过 Kubernetes RuntimeClass 和 Kata Containers，把 Pod 运行在 confidential VM 中。
+- Coordinator 自身也运行在 CVM 中，作为 attestation authority 和 service mesh CA。
+- Manifest 包含受信任 workload 的哈希与配置，CVM attestation 必须匹配 manifest 后才能加入 mesh。
+- 通过自动 mTLS 保护 pod-to-pod 和外部客户端到服务的通信。
+
+Edgeless 这类方案适合 AI pipeline、RAG 服务、微服务化模型服务、多方数据处理和 SaaS 证明场景。它的价值是把“单个 TEE 证明”提升为“整套服务拓扑证明”。风险也相应上移：manifest 是否准确、Coordinator 是否可用、镜像供应链是否可复现、Kubernetes 动态配置是否全部纳入策略，都会决定实际安全性。TEE 不会审计业务 API，因此模型输出、prompt injection 和数据外传仍要靠应用层控制。
+
+### Confidential Containers (CoCo)
+
+CoCo 是 CNCF sandbox 的 confidential Kubernetes 路线，采用 pod-centric 设计：不是把单个容器单独放进 enclave，也不是把整个 worker node 放进 TEE，而是让每个 Pod 运行在 Kata microVM/PodVM 中。Pod 内容器可以共享网络命名空间和本地通信，但 host、kubelet、其他 pod 和控制面不在信任边界内。
+
+架构关键点：
+
+- Host 上 kubelet/containerd/kata-shim 仍负责编排，但不应看到 Pod 内明文。
+- Guest 内 Kata Agent 启动容器，image-rs 在 guest 内拉取镜像，ocicrypt-rs 解密加密镜像层。
+- Attestation Agent 生成硬件/guest evidence，Confidential Data Hub 处理 secret 请求。
+- Trustee/KBS/AS/RVPS 作为外部 verifier 和 key broker，校验证明后释放 secret。
+- 对 AI 场景，CoCo 文档强调 GPU composite attestation，把 vCPU 和 accelerator evidence 绑定后再放 secret。
+
+CoCo 很适合把 RAG、推理、微调和联邦学习部署进 Kubernetes：RAG 文档库、vector DB、aggregator、FL client 都可以作为 confidential pod。它的关键优势是云原生工作流和开源生态；关键挑战是 TCB 包含 guest 组件、策略系统、镜像解密链路和 Trustee。部署者必须理解哪些 Kubernetes API 会跨越 confidential boundary，不能把普通 `kubectl exec`、动态 env、宽松 egress 当成安全默认值。
+
+### Anjuna Seaglass
+
+Anjuna Seaglass 是商业 lift-and-shift 平台，目标是把现有 Linux 应用或容器在不改代码的情况下迁移到 confidential runtime。它在 AI 场景中的价值是让 SaaS、ISV 或企业已有模型服务更容易进入 TEE，而不是要求团队直接面对 SGX/TDX/SEV-SNP/Nitro 的底层接口。
+
+架构关键点：
+
+- Build 阶段把原应用转成 Anjuna Confidential Containers 或 enclave-ready hardened image。
+- Deploy 阶段跨 AWS、Azure、Google Cloud 或本地环境发布，减少厂商特定 glue code。
+- Run 阶段提供 in-use、at-rest、in-transit 的持续加密保护。
+- Trust 阶段由 Anjuna Policy Manager 做 attestation-aware secrets store，根据证明和授权策略释放 secret。
+
+适合想保护现有模型 API、数据库代理、向量服务、SaaS 后端或 AI 数据处理服务的企业。优势是迁移门槛低；短板是平台抽象层、Policy Manager、运行时镜像和供应链成为关键 TCB。对高安全等级模型权重保护，仍应明确 GPU evidence、权重 release policy、日志和输出约束，而不能只依赖“应用已在 confidential container 中运行”。
+
+## 架构形态总结
+
+| 形态 | 代表方案 | 最适合 | 主要强项 | 主要短板 |
+| --- | --- | --- | --- | --- |
+| 固定 AI 产品 | Apple PCC、Anthropic Confidential Inference | 面向最终用户的受控 AI 服务 | 服务商能把软件栈、release、证明、审计做成闭环 | 不一定开放给任意 workload；客户自定义能力有限 |
+| 云上 confidential GPU primitive | Azure Confidential GPU、Google Confidential Space + CC GPU | 企业自管模型服务、多方数据协作 | 易接入云 KMS/IAM/镜像/网络生态 | 支持矩阵复杂，CPU/GPU/镜像/策略必须同时正确 |
+| 企业 KMS/控制面 | Fortanix Confidential AI、Anjuna Seaglass | 第三方模型进入企业环境、旧应用迁移 | 策略、密钥、证明、审计产品化 | 平台控制面进入信任链，厂商绑定更强 |
+| Confidential Kubernetes / service mesh | Edgeless Marblerun/Contrast、Confidential Containers | RAG、AI pipeline、微服务、FL、SaaS | 把多组件部署变成可证明拓扑，贴近云原生 | 策略复杂，Kubernetes 动态面和输出通道容易漏控 |
+| 小 TCB sidecar/enclave | AWS Nitro Enclaves、SGX/Keystone loader | 密钥代理、签名、权重 unwrap、小型敏感逻辑 | TCB 小，适合把密钥边界做窄 | 不直接解决 GPU HBM 和完整模型服务保护 |
 
 ## 应用场景
 
@@ -243,7 +393,14 @@ TEE for ML 的边界应按数据生命周期逐段检查：
 - AI Wiki: Trusted Execution Environments for machine learning: https://aiwiki.ai/wiki/tee_for_ml
 - Confidential Computing Consortium: A Technical Analysis of Confidential Computing: https://confidentialcomputing.io/
 - NVIDIA: Confidential Computing on H100 GPUs for Secure and Trustworthy AI: https://developer.nvidia.com/blog/confidential-computing-on-h100-gpus-for-secure-and-trustworthy-ai/
+- NVIDIA Trusted Computing Solutions: https://docs.nvidia.com/nvtrust/index.html
 - Apple Security Research: Private Cloud Compute: https://security.apple.com/blog/private-cloud-compute/
+- Microsoft Azure Confidential Computing: https://learn.microsoft.com/en-us/azure/confidential-computing/overview
+- AWS Nitro Enclaves: https://docs.aws.amazon.com/enclaves/latest/user/nitro-enclave.html
+- Fortanix Confidential AI: https://www.fortanix.com/platform/confidential-ai
+- Edgeless Marblerun: https://www.edgeless.systems/products/marblerun
+- Edgeless Contrast: https://docs.edgeless.systems/contrast/
+- Anjuna Seaglass Platform: https://www.anjuna.io/product
 - Google Cloud: Confidential Space overview: https://docs.cloud.google.com/confidential-computing/confidential-space/docs/confidential-space-overview
 - Confidential Containers: Overview and architecture: https://confidentialcontainers.org/docs/overview/
 - Confidential Containers: Confidential AI use case: https://confidentialcontainers.org/docs/use-cases/confidential-ai/
